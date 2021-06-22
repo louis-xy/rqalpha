@@ -1,10 +1,7 @@
 import talib as tl
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import matplotlib.ticker as mticker
-import matplotlib.dates as dates
 import matplotlib.dates as mdates
 import datetime
 
@@ -170,7 +167,7 @@ class MACD:
         date = self.date.sort_index(ascending=False).reset_index(drop=True)
         plt.rcParams['font.sans-serif']=['SimHei']  # 用来正常显示中文标签
         plt.rcParams['axes.unicode_minus']=False  # 用来正常显示负号
-        fig = plt.figure(figsize=(18, 5))
+        fig = plt.figure(figsize=(18, 5), dpi=300)
         ax = fig.add_subplot(111)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         ax.xaxis.set_major_locator(ticker.MultipleLocator(3))
@@ -193,3 +190,4 @@ class MACD:
                 plt.scatter(i, dea[i], color='', marker='o', edgecolors='green', s=150, linewidths=1.5)
         plt.legend(['DEA', 'DIF'], loc=2)
         plt.show()
+

@@ -849,8 +849,8 @@ def subscribe_event(event_type, handler):
     EXECUTION_PHASE.ON_INIT
 )
 def set_slippage(slippage_model, slippage):
-    env = Environment.get_instance()
-    env.broker.set_simulation_slippage(slippage_model, slippage)
+    broker = Environment.get_instance().broker
+    broker.set_simulation_slippage(slippage_model, slippage)
     
 
 @export_as_api
@@ -906,5 +906,3 @@ def withdraw(account_type, amount):
     """
     env = Environment.get_instance()
     return env.portfolio.deposit_withdraw(account_type, amount * -1)
-
-

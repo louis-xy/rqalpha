@@ -119,6 +119,3 @@ class SignalBroker(AbstractBroker):
 
     def set_simulation_slippage(self, slippage_model, slippage):
         self._slippage_decider = SlippageDecider(slippage_model, slippage)
-    
-    
-        

@@ -20,6 +20,7 @@ def before_trading(context):
 
 def handle_bar(context, bar_dict):
     if not context.fired:
+        user_log.info("====================================")
         # order_percent并且传入1代表买入该股票并且使其占有投资组合的100%
         #order_percent(context.s1, 1)
         close = history_bars(context.s1, 1, '1d', 'close', adjust_type='post')
@@ -29,7 +30,7 @@ def handle_bar(context, bar_dict):
 
 config = {
   "base": {
-    "start_date": "2021-05-06",
+    "start_date": "2021-05-01",
     "end_date": "2021-06-01",
     "benchmark": "000300.XSHG",
     "accounts": {

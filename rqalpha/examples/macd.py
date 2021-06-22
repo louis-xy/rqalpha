@@ -13,6 +13,7 @@ def init(context):
     #set_option('use_real_price', True)
     # 输出内容到日志 log.info()
     user_log.info('初始函数开始运行且全局只运行一次')
+    g.buy_and_sell_data = []
     # 过滤掉order系列API产生的比error级别低的log
     #user_log.set_level('order', 'error')
 
@@ -24,11 +25,11 @@ def init(context):
     ## 运行函数（reference_security为运行时间的参考标的；传入的标的只做种类区分，因此传入'000300.XSHG'或'510300.XSHG'是一样的）
     # 开盘前运行
 
-    scheduler.run_daily(handle_bar, time_rule=14*60+50)
+    # scheduler.run_daily(handle_bar, time_rule=14*60+50)
 
     # 从这里开始我的
     # 持有股票数量
-    g.STOCKCOUNT = 5
+    g.STOCKCOUNT = 1
 
 def before_trading(context):
     # 当前持有的股票
@@ -43,8 +44,8 @@ def before_trading(context):
     # g.today90 = g.today -  timedelta(days=90)
 
     #g.all_securities = all_instruments(['stock'], g.today90)
-    g.all_securities = all_instruments(type='CS')['order_book_id'].tolist()
-
+    #g.all_securities = all_instruments(type='CS')['order_book_id'].tolist()
+    g.all_securities = [context.s1]
     # for stocknum in g.all_securities
 
     # 获得所有股票代码
@@ -69,8 +70,10 @@ def before_trading(context):
 
 # 你选择的证券的数据更新将会触发此段逻辑，例如日或分钟历史数据切片或者是实时数据切片更新
 def handle_bar(context, bar_dict):
+    user_log.info("-=========================================================================")
     # 开始编写你的主要的算法逻辑
     sell_list = get_sell_list(context, g.bought_stocks_o)
+
     if len(sell_list) > 0:
         # log.info("to sell: %s" % sell_list)
         for security in sell_list:
@@ -91,6 +94,7 @@ def handle_bar(context, bar_dict):
         user_log.info("to buy list: %s" % buy_list)
         numtobuy = g.STOCKCOUNT - g.bought_num
         buy_cash = context.portfolio.cash / numtobuy
+        user_log.info("buy cash {}".format(context.portfolio.cash))
         for security in buy_list:
             todayclose = history_bars(security, 1, '1d', fields=['close'], include_now=True)
             if buy_cash < 100 * todayclose[0][0]:
@@ -118,7 +122,7 @@ def get_sell_list(context, securitylist):
     for security in securitylist:
         prices = history_bars(security, 300, '1d', 'close')
         t_dif, t_dea, t_macd = talib.MACD(prices, fastperiod=12, slowperiod=26, signalperiod=9)
-        yt_dif, yt_dea, yt_macd = talib.MACD(prices[:-2], fastperiod=12, slowperiod=26, signalperiod=9)
+        yt_dif, yt_dea, yt_macd = talib.MACD(prices[:-1], fastperiod=12, slowperiod=26, signalperiod=9)
 
         todayclose = history_bars(security, 1, '1d', fields=['high', 'close'], include_now=True)
         #hisclose = history_bars(security, 21, unit='1d', fields=['close'], include_now=True)
@@ -181,6 +185,7 @@ def get_buy_list(context, securitylist, numtoget):
 
         # 出现红柱的第一天，可以买入
         if yt_macd[-1] < 0 and t_macd[-1] > 0:  # 出现金叉
+            user_log.info("%s 出现金叉" % security)
             listgot.append(security)
             numgot += 1
             continue
@@ -202,7 +207,7 @@ def get_buy_list(context, securitylist, numtoget):
 
 config = {
   "base": {
-    "start_date": "2016-06-01",
+    "start_date": "2017-06-01",
     "end_date": "2021-06-01",
     "accounts": {
       "stock": 100000
@@ -214,8 +219,9 @@ config = {
   "mod": {
     "sys_analyser": {
             "enabled": True,
-            "benchmark": "000300.XSHG",
-            "plot": True
+            "benchmark": "000001.XSHE",
+            "plot": True,
+            "report_save_path": "rst.csv"
         },
     "sys_simulation": {
         "enabled": True,

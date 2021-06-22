@@ -1,0 +1,9 @@
+"""
+MA
+MACD
+KDJ
+RSI
+BOLL
+WR
+DMI
+"""
